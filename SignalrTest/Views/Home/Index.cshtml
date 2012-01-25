@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<script type="text/javascript">
+
+    $(function () {
+        // Proxy created on the fly
+        var chat = $.connection.chat;
+
+        // Declare a function on the chat hub so the server can invoke it
+        chat.addMessage = function (message) {
+            $('#messages').append('<li>' + message + '</li>');
+        };
+
+        chat.setServerMousePosition = function (x, y) {
+            $('#mouseIndicator').offset({top: y, left: x});
+        };
+
+        $("#broadcast").click(function () {
+            // Call the chat method on the server
+            chat.send($('#msg').val());
+        });
+
+        // Start the connection
+        $.connection.hub.start();
+
+        $("body").mousemove(function (e) {
+            //var pagecoords = "( " + e.pagex + ", " + e.pagey + " )";
+            //var clientcoords = "( " + e.clientx + ", " + e.clienty + " )";
+            $("#mouse-x").text("( e.clientx ) - " + e.clientX);
+            $("#mouse-y").text("( e.clienty ) - " + e.clientY);
+
+            chat.mousePosition({ x: e.clientX, y: e.clientY });
+        });
+    });
+    
+    </script>
+
+<div id="mouse-x"></div>
+<div id="mouse-y"></div>
+<div id="mouseIndicator" style="height: 20px; width: 20px; background-color:blue;"></div>
+<input type="text" id="msg" />
+<input type="button" id="broadcast" />
+<ul id="messages"></ul>
