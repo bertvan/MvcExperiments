@@ -24,7 +24,9 @@ function initParagraphEditing() {
 
     // Declare a function on the chat hub so the server can invoke it
     paragraphHub.reloadParagraphs = function (paragraphs) {
-        //alert('go go go');
+        //alert('go go go'); 
+        // TODO, more logic needs to go into the ViewModel, to callback on it when the 
+        // data is reloaded: see example on http://learn.knockoutjs.com/#/?tutorial=loadingsaving
     };
 
     // Start the connection
@@ -52,7 +54,7 @@ function initParagraphEditing() {
         paragraphHub.send(
         {
             id: 0,
-            text: $(this).html() // todo, KnockoutJS binding does not seem to work that way, so fetching myself here :s
+            text: $(this).html() // improvement needed, KnockoutJS binding does not seem to work that way, so fetching myself here :s
         });
     });
 }
