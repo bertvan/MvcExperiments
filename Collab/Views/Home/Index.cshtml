@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<script type="text/javascript">
+
+    $(function () {
+        initParagraphEditing();
+    });
+
+</script>
+
+<div class="paragraphs-container" data-bind="foreach: paragraphs">
+
+@*<form data-bind="submit: postChangedParagraph">*@
+
+<div class="paragraph-container">
+    <div class="paragraph-text" contentEditable="true" data-bind="html: text">
+        bla
+    </div>
+    <div class="paragraph-menu">
+        <button class="paragraph-menu-editbutton">Edit</button>
+    </div>
+</div>
+
+    @*<textarea class="paragraph" data-bind="value: text">
+    </textarea>*@
+@*</form>*@
+
+</div>
