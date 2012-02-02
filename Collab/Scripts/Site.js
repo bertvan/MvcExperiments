@@ -6,14 +6,21 @@
 
     self.save = function (text) {
 
-    	// Call the paragraphHub method on the server
-    	// improvement needed, KnockoutJS binding does not seem to work that way, so fetching myself here :s
-    	// so I actually should be able to use paragraph.text ... ?
-    	var paragraphHub = $.connection.paragraphHub;
-    	paragraphHub.send(
+        // text will need some preocessing before sending it over the wire
+        var processedText = text
+            .replace('<div>', '\\n\\n')
+            .replace('</div>', '');
+
+        //processedText;
+
+        // Call the paragraphHub method on the server
+        // improvement needed, KnockoutJS binding does not seem to work that way, so fetching myself here :s
+        // so I actually should be able to use paragraph.text ... ?
+        var paragraphHub = $.connection.paragraphHub;
+        paragraphHub.send(
         {
-        	id: self.id,
-        	text: text
+            id: self.id,
+            text: processedText
         });
     };
 }
@@ -30,10 +37,17 @@ function ParagraphEditingViewModel() {
     ]);
 
     self.updateParagraphs = function (data) {
-    	// data received in viewmodel
-    	var mapped = $.map(data, function (item) { return new Paragraph(item.Id, item.Text) });
-    	self.paragraphs(mapped);
-	}
+
+        // data received in viewmodel
+        var mapped = $.map(data, function (item) {
+
+            var processedText = item.Text.replace('\\n\\n', '<br/>');
+            return new Paragraph(item.Id, processedText)
+
+        });
+
+        self.paragraphs(mapped);
+    }
 }
 
 function initParagraphEditing() {
