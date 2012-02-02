@@ -18,7 +18,7 @@
 @*<form data-bind="submit: postChangedParagraph">*@
 
 <div class="paragraph-container">
-    <div class="paragraph-text" contentEditable="true" data-bind="html: text">
+    <div class="paragraph-text" contentEditable="true" data-bind="html: text, change: save">
         bla
     </div>
     <div class="paragraph-menu">
