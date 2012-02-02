@@ -38,6 +38,8 @@ function ParagraphEditingViewModel() {
 
 function initParagraphEditing() {
 
+    createCustomKnockoutBindings();
+
 	var model = new ParagraphEditingViewModel();
 
     // signalR (comments not mine, but from an original sample I used
@@ -66,25 +68,78 @@ function initParagraphEditing() {
 
 function initChangeDetection() {
 
-    $('[contenteditable]').live('focus', function () {
-        var $this = $(this);
-        $this.data('before', $this.html());
-        return $this;
-    }).live('blur', function () {
-        var $this = $(this);
-        if ($this.data('before') !== $this.html()) {
-            $this.data('before', $this.html());
-            $this.trigger('change');
-        }
-        return $this;
-    });
+// all commented out, trying to do change detection directly through KOJS now
+
+//    $('[contenteditable].paragraph-text').focus(function(){
+//        var $this = $(this);
+//        $this.data('before', $this.html());
+//        return $this;
+//    });
+
+//    $('[contenteditable].paragraph-text').blur(function(){
+//        var $this = $(this);
+//        if ($this.data('before') !== $this.html()) {
+//            $this.data('before', $this.html());
+//            $this.trigger('change');
+//        }
+//        return $this;
+//    });
 
     // trigger viewmodel paragraph change event
 	// again too bad we can't make this happen with binding
-    $('.paragraph-text').live('change', function () {
-    	var paragraph = ko.dataFor(this);
-    	var text = $(this).html();
-    	paragraph.save(text);
-    });
+//    $('.paragraph-text').live('change', function () {
+//    	var paragraph = ko.dataFor(this);
+//    	var text = $(this).html();
+//    	paragraph.save(text);
+//    });
+
+}
+
+function createCustomKnockoutBindings() {
+
+    // htmlValue binding
+    // see also: http://jsfiddle.net/rniemeyer/JksKx/
+    // and http://stackoverflow.com/questions/6987132/knockoutjs-html-binding
+    ko.bindingHandlers.htmlValue = {
+        init: function (element, valueAccessor, allBindingsAccessor) {
+            ko.utils.registerEventHandler(element, "blur", function () {
+                var modelValue = valueAccessor();
+                var elementValue = element.innerHTML;
+                if (ko.isWriteableObservable(modelValue)) {
+                    modelValue(elementValue);
+                }
+                else { //handle non-observable one-way binding
+                    var allBindings = allBindingsAccessor();
+                    if (allBindings['_ko_property_writers'] && allBindings['_ko_property_writers'].htmlValue) allBindings['_ko_property_writers'].htmlValue(elementValue);
+                }
+            })
+        },
+        update: function (element, valueAccessor) {
+            var value = ko.utils.unwrapObservable(valueAccessor()) || "";
+            element.innerHTML = value;
+        }
+    };
+
+    // htmlChange binding
+    ko.bindingHandlers.htmlChange = {
+        init: function (element, valueAccessor) {
+
+            ko.utils.registerEventHandler(element, 'focus', function () {
+
+                $(element).data('before', $(element).html());
+
+            });
+
+            ko.utils.registerEventHandler(element, "blur", function () {
+                var value = valueAccessor();
+                var elementValue = element.innerHTML;
+
+                if ($(element).data('before') !== $(element).html()) {
+                    $(element).data('before', $(element).html());
+                    value(elementValue);
+                }
+            });
+        }
+    };
 
 }
