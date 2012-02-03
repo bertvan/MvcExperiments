@@ -7,9 +7,11 @@
     self.save = function (text) {
 
         // text will need some preocessing before sending it over the wire
-        var processedText = text
-            .replace('<div>', '\\n\\n')
-            .replace('</div>', '');
+//        var processedText = text
+//            .replace('<div>', '\\n\\n')
+    	//            .replace('</div>', '');
+
+    	var textEncoded = $('<div/>').text(text).html();
 
         //processedText;
 
@@ -20,7 +22,7 @@
         paragraphHub.send(
         {
             id: self.id,
-            text: processedText
+            text: textEncoded
         });
     };
 }
@@ -29,25 +31,28 @@ function ParagraphEditingViewModel() {
 
 	var self = this;
 
-    self.paragraphs = ko.observableArray(
-    [
-        new Paragraph(0, "bla"),
-        new Paragraph(1, "foo"),
-        new Paragraph(2, "hihihi")
-    ]);
+	self.paragraphs = ko.observableArray([]);
 
-    self.updateParagraphs = function (data) {
+	self.updateParagraphs = function (data) {
 
-        // data received in viewmodel
-        var mapped = $.map(data, function (item) {
+		// data received in viewmodel
+		var mapped = $.map(data, function (item) {
 
-            var processedText = item.Text.replace('\\n\\n', '<br/>');
-            return new Paragraph(item.Id, processedText)
+			//var processedText = item.Text.replace('\\n\\n', '<br/>');
+			//return new Paragraph(item.Id, processedText)
+			return new Paragraph(item.Id, item.Text)
 
-        });
+		});
 
-        self.paragraphs(mapped);
-    }
+		self.paragraphs(mapped);
+	};
+
+	// load initial state from the server
+	$.getJSON("/paragraph/list", function (allData) {
+		//var mappedTasks = $.map(allData, function (item) { return new Task(item) });
+		//self.tasks(mappedTasks);
+		self.updateParagraphs(allData);
+	});
 }
 
 function initParagraphEditing() {

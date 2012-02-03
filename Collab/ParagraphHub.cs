@@ -15,6 +15,7 @@ namespace Collab
         {
             var id = (int)stuff["id"];
             var text = stuff["text"];
+			text = HttpUtility.HtmlDecode(text);
 
             var service = new ParagraphService();
             service.UpdateParagraph(id, text);
